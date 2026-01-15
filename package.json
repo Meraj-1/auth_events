@@ -1,6 +1,6 @@
 {
   "name": "auth-events",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A lightweight Node.js library to track and react to authentication events across any auth provider.",
   "type": "module",
   "main": "dist/index.js",
@@ -37,4 +37,3 @@
     "ts-node": "^10.9.1"
   }
 }
-
