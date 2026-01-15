@@ -2,23 +2,39 @@
   "name": "auth-events",
   "version": "0.0.1",
   "description": "A lightweight Node.js library to track and react to authentication events across any auth provider.",
-    "type": "module",     
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
+  "license": "MIT",
+  "author": "Meraj Ansari",
+  "keywords": [
+    "auth",
+    "authentication",
+    "sessions",
+    "events",
+    "nodejs",
+    "npm"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --dts",
+    "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsup src/index.ts --watch",
-    "start": "node --loader ts-node/esm examples/test.ts",
-    "test": "ts-node-esm examples/tests.ts",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["auth", "authentication", "sessions", "events", "nodejs", "npm"],
-  "author": "Meraj Ansari",
-  "license": "MIT",
- "devDependencies": {
-  "tsup": "^6.6.0",
-  "typescript": "^5.1.6",
-  "@types/node": "^20.5.1",
-  "ts-node": "11.0.0"
+  "devDependencies": {
+    "tsup": "^6.6.0",
+    "typescript": "^5.1.6",
+    "@types/node": "^20.5.1",
+    "ts-node": "^10.9.1"
+  }
 }
-}
+
