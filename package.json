@@ -16,7 +16,6 @@
     "dist/index.js",
     "dist/index.d.ts"
   ],
-  "license": "MIT",
   "author": "Meraj Ansari",
   "keywords": [
     "auth",
