@@ -1,12 +1,8 @@
 # auth-events
 
-<<<<<<< HEAD
-![npm](https://img.shields.io/npm/v/auth-events) 
-=======
 ![npm](https://img.shields.io/npm/v/auth-events)
 
 
->>>>>>> 3ded054 (feat: add emitLogin helper with full AuthEvent payload)
 
 # auth-events — Authentication Event Engine for Node.js
 
