@@ -17,7 +17,6 @@ export class AuthEvents {
       timestamp: new Date(),
       ...payload
     };
-
     await this.bus.emit(event, this.createContext());
   }
 
