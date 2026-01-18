@@ -1,148 +1,168 @@
 # auth-events
 
 ![npm](https://img.shields.io/npm/v/auth-events) ![license](https://img.shields.io/github/license/<your-username>/auth-events)
-auth-events is a lightweight, open-source Node.js library that lets you listen to, track, and react to authentication events in a clean, event-driven way.
 
-Auth providers like Auth0, Clerk, Firebase, or custom JWT systems handle authentication well —
-but they don’t give you enough control over what happens after authentication.
 
-That’s where auth-events fits in.
 
-🚀 What Problem Does It Solve?
+# auth-events — Authentication Event Engine for Node.js
 
-Most apps need to react when something happens in auth:
+A lightweight, open-source Node.js library to **listen, track, and react to authentication events** in a clean, event-driven way.
 
-User logs in → track activity
+Authentication providers like Auth0, Clerk, Firebase, or custom JWT systems handle authentication well — but they don’t give you enough control over what happens *after authentication.*
 
-Password changes → revoke sessions
+That’s where **auth-events** fits in.
 
-Role changes → update permissions
+---
 
-Suspicious login → trigger security flow
+## 🚀 What Problem Does It Solve?
 
-Instead of scattering this logic across your codebase, auth-events centralizes everything using events.
+Most applications need to react when authentication events occur.
 
-✨ Features
+| Event | Purpose |
+|------|--------|
+| User logs in | Track activity |
+| Password changes | Revoke sessions |
+| Role changes | Sync permissions |
+| Suspicious login | Trigger security flows |
 
-Event-Driven Auth Logic
-React to auth events like login, logout, password changes, and role updates.
+Instead of scattering this logic across your backend, **auth-events centralizes it using events.**
 
-Provider Agnostic
-Works with Auth0, Clerk, Firebase, custom JWT, or any backend.
+---
 
-Clean & Typed API
-Strong TypeScript support with predefined event types.
+## ✨ Features
 
-Post-Auth Control
-Handle security, analytics, logging, and automation after authentication.
+- Event-Driven Authentication Logic
+- Provider-Agnostic (Auth0, Clerk, Firebase, JWT, etc.)
+- Strong TypeScript Support
+- Full Post-Authentication Control
+- Minimal & Lightweight
+- No heavy dependencies
 
-Minimal & Lightweight
-No heavy dependencies, no magic, easy to extend.
+---
 
-⚡ Installation
+## ⚡ Installation
+
+```bash
 npm install auth-events
+```
 
+or
 
-or with yarn:
-
+```bash
 yarn add auth-events
+```
 
-🧠 Core Concept
+---
 
-auth-events exposes an event emitter for authentication actions.
+## 🧠 Core Concept
 
-You emit events when auth happens, and subscribe to them anywhere in your app.
+You **emit events when authentication happens**, and **subscribe to them anywhere in your app.**
 
 Supported event types:
 
+```ts
 export type AuthEventType =
   | "login"
   | "logout"
   | "password_changed"
   | "role_changed";
+```
 
-📦 Basic Usage
-1️⃣ Import the library
+---
+
+## 📦 Basic Usage
+
+### 1️⃣ Import the Library
+
+```ts
 import { auth } from "auth-events";
+```
 
-2️⃣ Listen to auth events
-Login event
+---
+
+### 2️⃣ Listen to Authentication Events
+
+#### Login Event
+
+```ts
 auth.on("login", (event) => {
-  console.log(
-    `User ${event.userId} logged in at ${event.timestamp}`
-  );
+  console.log(`User ${event.userId} logged in at ${event.timestamp}`);
 });
+```
 
-Password change event
+#### Password Change Event
+
+```ts
 auth.on("password_changed", (event) => {
-  console.log(
-    `Password changed for user ${event.userId}`
-  );
+  console.log(`Password changed for user ${event.userId}`);
 
-  // Example use-case:
-  // revokeAllSessions(event.userId)
+  // Example:
+  // revokeAllSessions(event.userId);
 });
+```
 
-3️⃣ Emit events from your auth logic
+---
 
-Example inside your login controller:
+### 3️⃣ Emit Events from Your Auth Logic
 
+#### Example: Login Controller
+
+```ts
 auth.emit("login", {
   userId: user.id,
   timestamp: Date.now(),
   ipAddress: req.ip,
 });
+```
 
+#### Example: Password Update
 
-Example after password update:
-
+```ts
 auth.emit("password_changed", {
   userId: user.id,
   timestamp: Date.now(),
 });
+```
 
-🛠️ Where Can You Use This?
+---
 
-Security monitoring (suspicious logins)
+## 🛠️ Where Can You Use This?
 
-Session management
+- Security monitoring
+- Session management
+- Audit logs
+- Analytics & tracking
+- Notifications
+- Role & permission syncing
+- Compliance logging
 
-Audit logs
+---
 
-Analytics
+## 🧩 Works With
 
-Notifications
+- Auth0
+- Clerk
+- Firebase Auth
+- Custom JWT / Session Auth
+- Any Node.js backend
 
-Role & permission syncing
+---
 
-Compliance & tracking
+## 🌱 Philosophy
 
-🧩 Works With
+**Authentication tells you who the user is.**  
+**auth-events tells you what to do next.**
 
-Auth0
+---
 
-Clerk
+## 🤝 Contributing
 
-Firebase Auth
+Contributions and feedback are welcome.  
+Open an issue or submit a pull request 🚀
 
-Custom JWT / Session auth
+---
 
-Any Node.js backend
-
-🌱 Philosophy
-
-Authentication tells you who the user is
-auth-events tells you what to do next
-
-🤝 Contributing
-
-Contributions, ideas, and feedback are welcome.
-Open an issue or submit a PR 🚀
-
-📄 License
+## 📄 License
 
 MIT License
-## ⚡ Installation
 
-```bash
-npm install auth-events
