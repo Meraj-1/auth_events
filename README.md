@@ -1,6 +1,6 @@
 # auth-events
 
-![npm](https://img.shields.io/npm/v/auth-events) ![license](https://img.shields.io/github/license/<your-username>/auth-events)
+![npm](https://img.shields.io/npm/v/auth-events)
 
 
 
