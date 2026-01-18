@@ -126,7 +126,7 @@ auth.emit("password_changed", {
 
 ---
 
-## 🛠️ Where Can You Use This?
+ Where Can You Use This?
 
 - Security monitoring
 - Session management
@@ -138,7 +138,7 @@ auth.emit("password_changed", {
 
 ---
 
-## 🧩 Works With
+ Works With
 
 - Auth0
 - Clerk
@@ -148,24 +148,20 @@ auth.emit("password_changed", {
 
 ---
 
-## 🌱 Philosophy
+ Philosophy
 
 **Authentication tells you who the user is.**  
 **auth-events tells you what to do next.**
 
 ---
 
-## 🤝 Contributing
+ Contributing
 
 Contributions and feedback are welcome.  
 Open an issue or submit a pull request 🚀
 
 ---
 
-## 📄 License
+License
 
 MIT License
-<<<<<<< HEAD
-
-=======
->>>>>>> 733ea20 (chore: prepare release)
