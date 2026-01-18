@@ -1,35 +1,147 @@
 # auth-events
 
 ![npm](https://img.shields.io/npm/v/auth-events) ![license](https://img.shields.io/github/license/<your-username>/auth-events)
+auth-events is a lightweight, open-source Node.js library that lets you listen to, track, and react to authentication events in a clean, event-driven way.
 
-**auth-events** is a lightweight, open-source Node.js library designed to **track, monitor, and react to authentication events** across any authentication provider.  
+Auth providers like Auth0, Clerk, Firebase, or custom JWT systems handle authentication well —
+but they don’t give you enough control over what happens after authentication.
 
-While providers like Auth0, Clerk, or Firebase handle authentication, they do **not provide an easy way to control and respond to post-auth events**. This library fills that gap by giving developers **visibility, control, and automation** over everything that happens after login.
+That’s where auth-events fits in.
 
----
+🚀 What Problem Does It Solve?
 
-## 🚀 Features
+Most apps need to react when something happens in auth:
 
-- **Unified Event Tracking:** login, logout, password changes, role updates — all in one consistent API  
-- **Session Intelligence:** track active sessions, devices, locations, and token lifetimes  
-- **Rule Engine:** define custom logic for auth events (revoke sessions, force re-auth, trigger webhooks)  
-- **Provider-Agnostic:** works with Auth0, Clerk, Firebase, or any custom JWT auth  
-- **Developer-First:** minimal setup, zero magic, easy integration  
+User logs in → track activity
 
----
+Password changes → revoke sessions
 
-## 💡 Why Use auth-events?
+Role changes → update permissions
 
-Traditional auth providers solve "who the user is", but **what happens after login** is often messy and error-prone.  
+Suspicious login → trigger security flow
 
-With **auth-events**, developers can:  
-- Track all user sessions and devices  
-- Automatically enforce security rules (e.g., revoke old sessions after password change)  
-- React to suspicious logins or role changes  
-- Gain peace of mind and focus on business logic instead of boilerplate auth management  
+Instead of scattering this logic across your codebase, auth-events centralizes everything using events.
 
----
+✨ Features
 
+Event-Driven Auth Logic
+React to auth events like login, logout, password changes, and role updates.
+
+Provider Agnostic
+Works with Auth0, Clerk, Firebase, custom JWT, or any backend.
+
+Clean & Typed API
+Strong TypeScript support with predefined event types.
+
+Post-Auth Control
+Handle security, analytics, logging, and automation after authentication.
+
+Minimal & Lightweight
+No heavy dependencies, no magic, easy to extend.
+
+⚡ Installation
+npm install auth-events
+
+
+or with yarn:
+
+yarn add auth-events
+
+🧠 Core Concept
+
+auth-events exposes an event emitter for authentication actions.
+
+You emit events when auth happens, and subscribe to them anywhere in your app.
+
+Supported event types:
+
+export type AuthEventType =
+  | "login"
+  | "logout"
+  | "password_changed"
+  | "role_changed";
+
+📦 Basic Usage
+1️⃣ Import the library
+import { auth } from "auth-events";
+
+2️⃣ Listen to auth events
+Login event
+auth.on("login", (event) => {
+  console.log(
+    `User ${event.userId} logged in at ${event.timestamp}`
+  );
+});
+
+Password change event
+auth.on("password_changed", (event) => {
+  console.log(
+    `Password changed for user ${event.userId}`
+  );
+
+  // Example use-case:
+  // revokeAllSessions(event.userId)
+});
+
+3️⃣ Emit events from your auth logic
+
+Example inside your login controller:
+
+auth.emit("login", {
+  userId: user.id,
+  timestamp: Date.now(),
+  ipAddress: req.ip,
+});
+
+
+Example after password update:
+
+auth.emit("password_changed", {
+  userId: user.id,
+  timestamp: Date.now(),
+});
+
+🛠️ Where Can You Use This?
+
+Security monitoring (suspicious logins)
+
+Session management
+
+Audit logs
+
+Analytics
+
+Notifications
+
+Role & permission syncing
+
+Compliance & tracking
+
+🧩 Works With
+
+Auth0
+
+Clerk
+
+Firebase Auth
+
+Custom JWT / Session auth
+
+Any Node.js backend
+
+🌱 Philosophy
+
+Authentication tells you who the user is
+auth-events tells you what to do next
+
+🤝 Contributing
+
+Contributions, ideas, and feedback are welcome.
+Open an issue or submit a PR 🚀
+
+📄 License
+
+MIT License
 ## ⚡ Installation
 
 ```bash
