@@ -1,8 +1,6 @@
 # auth-events
 
-![npm](https://img.shields.io/npm/v/auth-events) ![license](https://img.shields.io/github/license/<your-username>/auth-events)
-
-
+![npm](https://img.shields.io/npm/v/auth-events) 
 
 # auth-events — Authentication Event Engine for Node.js
 
@@ -165,4 +163,7 @@ Open an issue or submit a pull request 🚀
 ## 📄 License
 
 MIT License
+<<<<<<< HEAD
 
+=======
+>>>>>>> 733ea20 (chore: prepare release)
