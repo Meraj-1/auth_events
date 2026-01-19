@@ -2,7 +2,8 @@
 
 ![npm](https://img.shields.io/npm/v/auth-events)
 
-# Auth Events 🚀
+# Auth Events 
+
 
 **`auth-events`** is a lightweight, powerful, and extensible Node.js library to handle authentication and user-related events in your application. It provides an **event-driven architecture** for login, logout, registration, password changes, role updates, device tracking, risk signals, and more.  
 
@@ -10,7 +11,7 @@ Designed for **security, audit, and automation**, it works with any auth provide
 
 ---
 
-## Features ✨
+## Features 
 
 - 🔹 **Core Auth Events:** login, logout, register, password changes, role updates
 - 🔹 **Security & Risk Events:** suspicious login, brute force detection, IP/device risk, geo-velocity
@@ -31,6 +32,11 @@ Designed for **security, audit, and automation**, it works with any auth provide
 npm install auth-events
 # or
 yarn add auth-events
+
+
+
+
+
 Basic Usage
 import { AuthEvents } from "auth-events";
 
@@ -47,6 +53,10 @@ authEvents.on("login", async (event, context) => {
 
   return { action: "allow" };
 });
+
+
+
+
 
 // Emit a login event
 await authEvents.login({
@@ -146,23 +156,16 @@ export type AuthEventType =
   | "provider_linked" | "provider_unlinked" | "provider_login" | "provider_error";
 
 
-
-
-
 Developer Tips
-Use changedFields + previousValues + newValues for auditing profile updates.
+Use changedFields, previousValues, and newValues for auditing profile updates.
 
-Use riskScore + isNewDevice + geoVelocityRisk for security automation.
+Use riskScore, isNewDevice, and geoVelocityRisk for security automation.
 
 Handlers can return actions: allow, block, or challenge (OTP, 2FA).
 
-Inject logger / db / cache in context for advanced workflows.
+Inject logger, db, cache in context for advanced workflows.
 
 Can be extended with plugins or middleware for notifications (email/SMS), dashboards, or analytics.
-
-
-
-
 
 Why use auth-events?
 ✅ Single source of truth for all auth-related actions
@@ -173,8 +176,6 @@ Why use auth-events?
 
 ✅ Enterprise-ready with audit trails, session management, MFA, and device trust
 
-
-
 Future Improvements
 Webhooks / external notifications
 
@@ -183,5 +184,3 @@ Priority-based handler execution
 Event persistence for audit / replay
 
 Rule engine for automated security actions
-
-
