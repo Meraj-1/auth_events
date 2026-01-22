@@ -1,6 +1,6 @@
 {
   "name": "auth-events",
-  "version": "0.0.11",
+  "version": "1.0.0",
   "description": "A lightweight Node.js library to track and react to authentication events across any auth provider.",
   "type": "module",
   "license": "MIT",
