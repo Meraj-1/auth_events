@@ -27,86 +27,48 @@ Designed for **security, audit, and automation**, it works with any auth provide
 
 ---
 
-## Installation
+Auth-Events
 
-```bash
-npm install auth-events
-# or
-yarn add auth-events
+auth-events is a lightweight, event-driven Node.js library for handling authentication and user-related events.
+It separates auth facts from business logic, keeping your authentication clean, testable, and secure.
 
-auth-events
-
-A lightweight event layer for authentication flows.
-
-🧠 Mental Model (Read this first)
-
-Think of authentication in two responsibilities:
-
-Auth Code   → WHAT happened?
-Auth Events → WHAT should we do about it?
+Mental Model
+Think of authentication as two responsibilities:
+Auth Code → WHAT happened? (e.g., login, password change)
+Auth Events → WHAT should we do about it? (e.g., audit, analytics, security rules)
 
 
 Examples:
 
-Login happened → emit event
+Login happened → emit "login" event
+Password changed → emit "password_changed" event
+New device detected → emit "new_device_detected" event
 
-Password changed → emit event
 
-New device detected → emit event
+auth-events broadcasts facts only. It does not handle business logic.
+Side-effects are managed separately via listeners, making your code clean, predictable, and secure.
 
-auth-events only broadcasts facts.
-It does not decide business logic.
 
-This keeps authentication clean and predictable.
+Auth code → emits event
+Listeners → handle side-effects
 
-❓ Why auth-events?
 
-Authentication logic often becomes bloated over time.
+How It Works
+Emit an event inside your existing auth code.
+Listeners react to the event.
+Auth logic stays clean and decoupled from side-effects.
 
-A simple login flow slowly accumulates responsibilities:
 
-audit logging
 
-security checks
 
-analytics
-
-notifications
-
-Soon, your auth code becomes:
-
-hard to read
-
-hard to test
-
-risky to change
-
-auth-events solves this by introducing a small event layer after authentication.
-
-Auth code emits events.
-Side-effects live elsewhere.
-
-🧩 How it works
-
-Your app emits an auth event (e.g. "login").
-
-One or more listeners react to that event.
-
-Authentication logic stays clean and focused.
-
-There is no coupling between auth code and side-effects.
-
-📁 Recommended File Structure
-
-This is where most projects go wrong — structure matters.
-
+📁 Recommended Project Structure
 src/
 ├─ auth/
-│  ├─ auth.controller.ts      # login, signup, logout
-│  ├─ auth.service.ts         # password verification, token logic
+│  ├─ auth.controller.ts    # login, signup, logout
+│  ├─ auth.service.ts       # password verification, token logic
 │
 ├─ auth-events/
-│  ├─ index.ts                # single AuthEvents instance
+│  ├─ index.ts              # single AuthEvents instance
 │  ├─ listeners/
 │  │  ├─ audit.listener.ts
 │  │  ├─ security.listener.ts
@@ -116,24 +78,20 @@ src/
 ├─ app.ts
 └─ server.ts
 
-🧩 Step 1: Create one global AuthEvents instance
 
-📍 src/auth-events/index.ts
 
+Step 1: Create Global AuthEvents Instance
+// src/auth-events/index.ts
 import { AuthEvents } from "auth-events";
 
 export const authEvents = new AuthEvents();
 
 
-⚠️ Important
 
-Your application should have only one AuthEvents instance.
-All listeners and emitters must use this same instance.
+Only one instance should exist. All emitters and listeners must use the same instance.
 
-🧩 Step 2: Emit events inside existing auth code
-
-📍 src/auth/auth.controller.ts
-
+Step 2: Emit Events in Auth Code
+// src/auth/auth.controller.ts
 import { authEvents } from "../auth-events";
 
 export const login = async (req, res) => {
@@ -145,25 +103,20 @@ export const login = async (req, res) => {
     ip: req.ip,
     userAgent: req.headers["user-agent"],
     sessionId: req.sessionID
-  )});
+  });
 
   res.json({ token: user.token });
 };
 
 
-✅ Login responsibility = done
-❌ No logging
-❌ No analytics
-❌ No security rules
 
-🧩 Step 3: Attach operations using listeners
+Auth responsibility = done
+No logging, analytics, or security rules here
 
-This is where auth-events shines.
+Step 3: Attach Side-Effects Using Listeners
+Security Listener
 
-🔐 Security listener
-
-📍 auth-events/listeners/security.listener.ts
-
+// auth-events/listeners/security.listener.ts
 import { authEvents } from "../index";
 
 authEvents.on("login", async (event) => {
@@ -172,10 +125,11 @@ authEvents.on("login", async (event) => {
   }
 });
 
-📜 Audit logging
 
-📍 auth-events/listeners/audit.listener.ts
 
+
+Audit Logging
+// auth-events/listeners/audit.listener.ts
 authEvents.on("login", async (event) => {
   await AuditLog.create({
     userId: event.userId,
@@ -185,20 +139,22 @@ authEvents.on("login", async (event) => {
   });
 });
 
-📊 Analytics tracking
 
-📍 auth-events/listeners/analytics.listener.ts
 
+Analytics Tracking
+// auth-events/listeners/analytics.listener.ts
 authEvents.on("login", async (event) => {
   analytics.track("user_login", {
     userId: event.userId,
     device: event.userAgent
-  )});
+  });
+});
 
-🔔 Notifications
 
-📍 auth-events/listeners/notification.listener.ts
 
+
+Notifications
+// auth-events/listeners/notification.listener.ts
 authEvents.on("new_device_detected", async (event) => {
   await sendEmail({
     to: event.userId,
@@ -208,50 +164,31 @@ authEvents.on("new_device_detected", async (event) => {
 
 
 
-// Emit a login event
-await authEvents.login({
-  userId: "123",
-  email: "user@example.com",
-  ip: "192.168.1.1",
-  deviceId: "device_abc123",
-  deviceType: "desktop",
-  browser: "Chrome",
-  country: "IN",
-  riskScore: 25,
-  status: "success"
-});
+
 AuthEvent Interface
-Each event provides a rich set of fields for security, auditing, and automation:
+AuthEvent provides rich context for security, auditing, and automation:
 
 export interface AuthEvent {
-  type: AuthEventType;           
-  userId: string;                
+  type: AuthEventType;
+  userId: string;
   email?: string;
   roles?: string[];
-
-  // Session & Token
   sessionId?: string;
   tokenId?: string;
   tokenType?: "jwt" | "session";
   tokenIssuedAt?: Date;
   tokenExpiresAt?: Date;
-
-  // Network
   ip?: string;
   isp?: string;
   country?: string;
   region?: string;
   city?: string;
   timezone?: string;
-
-  // Device
   deviceId?: string;
   deviceType?: "mobile" | "desktop" | "tablet";
   os?: string;
   browser?: string;
   userAgent?: string;
-
-  // Auth context
   provider?: "google" | "firebase" | "auth0" | "custom";
   origin?: "web" | "mobile" | "api";
   referrer?: string;
@@ -259,8 +196,6 @@ export interface AuthEvent {
   failureReason?: string;
   attemptCount?: number;
   authMethod?: "password" | "oauth" | "magic_link" | "otp";
-
-  // Risk signals
   riskScore?: number;
   deviceRiskScore?: number;
   geoVelocityRisk?: boolean;
@@ -269,8 +204,6 @@ export interface AuthEvent {
   isProxy?: boolean;
   isTor?: boolean;
   isBot?: boolean;
-
-  // Update / Change tracking
   changedFields?: string[];
   previousValues?: Record<string, any>;
   newValues?: Record<string, any>;
@@ -279,18 +212,16 @@ export interface AuthEvent {
   changeId?: string;
   previousVersion?: number;
   newVersion?: number;
-
-  // Meta & audit
   metadata?: Record<string, any>;
   requestId?: string;
   correlationId?: string;
-
   timestamp: Date;
 }
 
 
+
 AuthEventType
-All supported events (enterprise-ready):
+Enterprise-ready supported events:
 
 export type AuthEventType =
   | "login" | "logout" | "register" | "login_failed"
@@ -309,30 +240,41 @@ export type AuthEventType =
 
 
 
-
 Developer Tips
 
-Use changedFields, previousValues, and newValues for auditing profile updates.
+Use changedFields, previousValues, and newValues for auditing updates
 
-Use riskScore, isNewDevice, and geoVelocityRisk for security automation.
+Use riskScore, isNewDevice, and geoVelocityRisk for security automation
 
-Handlers can return actions: allow, block, or challenge (OTP, 2FA).
+Handlers can return actions: allow, block, or challenge (OTP, 2FA)
 
-Inject logger, db, cache in context for advanced workflows.
+Inject logger, db, cache in context for advanced workflows
 
-Can be extended with plugins or middleware for notifications (email/SMS), dashboards, or analytics.
+Extend with plugins/middleware for notifications, dashboards, or analytics
 
 
 
-Why use auth-events?
-Single source of truth for all auth-related actions
+ Why Use auth-events?
+
+Single source of truth for all auth actions
+
 Real-time risk analysis and automation
-Easy to integrate with any auth provider (custom, Firebase, Auth0, etc.)
-Enterprise-ready with audit trails, session management, MFA, and device trust
+
+Easy integration with any auth provider (custom, Firebase, Auth0, etc.)
+
+Enterprise-ready: audit trails, session management, MFA, device trust
 
 
-Future Improvements
+
+
+ Future Improvements
+
 Webhooks / external notifications
+
 Priority-based handler execution
-Event persistence for audit / replay
+
+Event persistence for audit/replay
+
 Rule engine for automated security actions
+
+This version is clean, structured, and reality-aligned, so any dev reading it can understand how to integrate auth-events and why it makes authentication safer and easier.
