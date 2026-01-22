@@ -2,73 +2,58 @@
 
 ![npm](https://img.shields.io/npm/v/auth-events)
 
-# Auth Events 
 
-**`auth-events`** is a lightweight, powerful, and extensible Node.js library to handle authentication and user-related events in your application. It provides an **event-driven architecture** for login, logout, registration, password changes, role updates, device tracking, risk signals, and more.  
+auth-events is a lightweight, event-driven Node.js library to handle authentication and user-related events in your application.
 
-**`auth-events`** is a lightweight, powerful, and extensible Node.js library to handle authentication and user-related events in your application. It provides an **event-driven architecture** for login, logout, registration, password changes, role updates, device tracking, risk signals, and more.  
+It separates authentication facts from business logic, keeping your auth code clean, testable, and secure.
 
-Designed for **security, audit, and automation**, it works with any auth provider (custom, Google, Firebase, Auth0, etc.) and can power your **enterprise-grade authentication workflows**.
+Features
 
----
+Core Auth Events: login, logout, register, password changes, role updates
 
-## Features 
+Security & Risk Events: suspicious login, brute force detection, IP/device risk, geo-velocity
 
-- 🔹 **Core Auth Events:** login, logout, register, password changes, role updates
-- 🔹 **Security & Risk Events:** suspicious login, brute force detection, IP/device risk, geo-velocity
-- 🔹 **Session & Token Lifecycle:** session creation, expiration, token issued/revoked/refresh
-- 🔹 **Device & Trust Tracking:** new device detection, device trust/untrust
-- 🔹 **Multi-Factor & Verification Events:** OTP, 2FA, email/phone verification
-- 🔹 **Update/Change Tracking:** profile updates, email/phone changes, previous and new values
-- 🔹 **Audit & Meta:** requestId, correlationId, custom metadata
-- 🔹 **Developer-Friendly Context:** logger, db, cache, env injected into handlers
-- 🔹 **Decision-Aware Handlers:** handlers can allow, block, or challenge actions
-- 🔹 **Enterprise Ready:** support for admin actions, automation, security scoring
+Session & Token Lifecycle: session creation, expiration, token issued/revoked/refresh
 
----
+Device & Trust Tracking: new device detection, device trust/untrust
 
-Auth-Events
+Multi-Factor & Verification Events: OTP, 2FA, email/phone verification
 
-auth-events is a lightweight, event-driven Node.js library for handling authentication and user-related events.
-It separates auth facts from business logic, keeping your authentication clean, testable, and secure.
+Update / Change Tracking: profile updates, email/phone changes, previous and new values
+
+Audit & Meta: requestId, correlationId, custom metadata
+
+Developer-Friendly Context: logger, db, cache, env injected into handlers
+
+Decision-Aware Handlers: handlers can allow, block, or challenge actions
 
 Mental Model
-Think of authentication as two responsibilities:
-Auth Code → WHAT happened? (e.g., login, password change)
-Auth Events → WHAT should we do about it? (e.g., audit, analytics, security rules)
 
+Think of authentication in two responsibilities:
+
+Auth Code → WHAT happened? (e.g., login, password change)
+
+Auth Events → WHAT should we do about it? (e.g., audit logging, analytics, security rules)
 
 Examples:
 
 Login happened → emit "login" event
+
 Password changed → emit "password_changed" event
+
 New device detected → emit "new_device_detected" event
 
+auth-events only broadcasts facts. It does not implement business logic.
+Side-effects are managed separately via listeners, keeping your code clean, predictable, and secure.
 
-auth-events broadcasts facts only. It does not handle business logic.
-Side-effects are managed separately via listeners, making your code clean, predictable, and secure.
-
-
-Auth code → emits event
-Listeners → handle side-effects
-
-
-How It Works
-Emit an event inside your existing auth code.
-Listeners react to the event.
-Auth logic stays clean and decoupled from side-effects.
-
-
-
-
-📁 Recommended Project Structure
+Recommended Project Structure
 src/
 ├─ auth/
-│  ├─ auth.controller.ts    # login, signup, logout
-│  ├─ auth.service.ts       # password verification, token logic
+│  ├─ auth.controller.ts      # login, signup, logout
+│  ├─ auth.service.ts         # password verification, token logic
 │
 ├─ auth-events/
-│  ├─ index.ts              # single AuthEvents instance
+│  ├─ index.ts                # single AuthEvents instance
 │  ├─ listeners/
 │  │  ├─ audit.listener.ts
 │  │  ├─ security.listener.ts
@@ -78,14 +63,16 @@ src/
 ├─ app.ts
 └─ server.ts
 
+Installation
+npm install auth-events
+# or
+yarn add auth-events
 
-
-Step 1: Create Global AuthEvents Instance
+Step 1: Create a Global AuthEvents Instance
 // src/auth-events/index.ts
 import { AuthEvents } from "auth-events";
 
 export const authEvents = new AuthEvents();
-
 
 
 Only one instance should exist. All emitters and listeners must use the same instance.
@@ -109,13 +96,12 @@ export const login = async (req, res) => {
 };
 
 
+✅ Login responsibility handled
 
-Auth responsibility = done
-No logging, analytics, or security rules here
+❌ No logging, analytics, or security rules here
 
 Step 3: Attach Side-Effects Using Listeners
 Security Listener
-
 // auth-events/listeners/security.listener.ts
 import { authEvents } from "../index";
 
@@ -124,9 +110,6 @@ authEvents.on("login", async (event) => {
     await authEvents.emit("new_device_detected", event);
   }
 });
-
-
-
 
 Audit Logging
 // auth-events/listeners/audit.listener.ts
@@ -139,8 +122,6 @@ authEvents.on("login", async (event) => {
   });
 });
 
-
-
 Analytics Tracking
 // auth-events/listeners/analytics.listener.ts
 authEvents.on("login", async (event) => {
@@ -149,9 +130,6 @@ authEvents.on("login", async (event) => {
     device: event.userAgent
   });
 });
-
-
-
 
 Notifications
 // auth-events/listeners/notification.listener.ts
@@ -162,12 +140,7 @@ authEvents.on("new_device_detected", async (event) => {
   });
 });
 
-
-
-
 AuthEvent Interface
-AuthEvent provides rich context for security, auditing, and automation:
-
 export interface AuthEvent {
   type: AuthEventType;
   userId: string;
@@ -218,11 +191,7 @@ export interface AuthEvent {
   timestamp: Date;
 }
 
-
-
 AuthEventType
-Enterprise-ready supported events:
-
 export type AuthEventType =
   | "login" | "logout" | "register" | "login_failed"
   | "suspicious_login" | "brute_force_detected"
@@ -238,23 +207,19 @@ export type AuthEventType =
   | "rate_limit_exceeded" | "policy_violation" | "security_rule_triggered" | "risk_score_updated"
   | "provider_linked" | "provider_unlinked" | "provider_login" | "provider_error";
 
-
-
 Developer Tips
 
-Use changedFields, previousValues, and newValues for auditing updates
+Use changedFields, previousValues, newValues for auditing profile updates
 
-Use riskScore, isNewDevice, and geoVelocityRisk for security automation
+Use riskScore, isNewDevice, geoVelocityRisk for security automation
 
 Handlers can return actions: allow, block, or challenge (OTP, 2FA)
 
 Inject logger, db, cache in context for advanced workflows
 
-Extend with plugins/middleware for notifications, dashboards, or analytics
+Extend with plugins or middleware for notifications, dashboards, or analytics
 
-
-
- Why Use auth-events?
+Why Use auth-events?
 
 Single source of truth for all auth actions
 
@@ -264,10 +229,7 @@ Easy integration with any auth provider (custom, Firebase, Auth0, etc.)
 
 Enterprise-ready: audit trails, session management, MFA, device trust
 
-
-
-
- Future Improvements
+Future Improvements
 
 Webhooks / external notifications
 
@@ -276,5 +238,3 @@ Priority-based handler execution
 Event persistence for audit/replay
 
 Rule engine for automated security actions
-
-This version is clean, structured, and reality-aligned, so any dev reading it can understand how to integrate auth-events and why it makes authentication safer and easier.
