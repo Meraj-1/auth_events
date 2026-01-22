@@ -1,7 +1,4 @@
-# auth-events
-
 ![npm](https://img.shields.io/npm/v/auth-events)
-
 # Auth Events 
 
 **`auth-events`** is a lightweight, powerful, and extensible Node.js library to handle authentication and user-related events in your application. It provides an **event-driven architecture** for login, logout, registration, password changes, role updates, device tracking, risk signals, and more.  
