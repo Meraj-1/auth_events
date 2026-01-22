@@ -33,22 +33,180 @@ Designed for **security, audit, and automation**, it works with any auth provide
 npm install auth-events
 # or
 yarn add auth-events
-Basic Usage
+
+auth-events
+
+A lightweight event layer for authentication flows.
+
+🧠 Mental Model (Read this first)
+
+Think of authentication in two responsibilities:
+
+Auth Code   → WHAT happened?
+Auth Events → WHAT should we do about it?
+
+
+Examples:
+
+Login happened → emit event
+
+Password changed → emit event
+
+New device detected → emit event
+
+auth-events only broadcasts facts.
+It does not decide business logic.
+
+This keeps authentication clean and predictable.
+
+❓ Why auth-events?
+
+Authentication logic often becomes bloated over time.
+
+A simple login flow slowly accumulates responsibilities:
+
+audit logging
+
+security checks
+
+analytics
+
+notifications
+
+Soon, your auth code becomes:
+
+hard to read
+
+hard to test
+
+risky to change
+
+auth-events solves this by introducing a small event layer after authentication.
+
+Auth code emits events.
+Side-effects live elsewhere.
+
+🧩 How it works
+
+Your app emits an auth event (e.g. "login").
+
+One or more listeners react to that event.
+
+Authentication logic stays clean and focused.
+
+There is no coupling between auth code and side-effects.
+
+📁 Recommended File Structure
+
+This is where most projects go wrong — structure matters.
+
+src/
+├─ auth/
+│  ├─ auth.controller.ts      # login, signup, logout
+│  ├─ auth.service.ts         # password verification, token logic
+│
+├─ auth-events/
+│  ├─ index.ts                # single AuthEvents instance
+│  ├─ listeners/
+│  │  ├─ audit.listener.ts
+│  │  ├─ security.listener.ts
+│  │  ├─ analytics.listener.ts
+│  │  └─ notification.listener.ts
+│
+├─ app.ts
+└─ server.ts
+
+🧩 Step 1: Create one global AuthEvents instance
+
+📍 src/auth-events/index.ts
+
 import { AuthEvents } from "auth-events";
 
-const authEvents = new AuthEvents();
+export const authEvents = new AuthEvents();
 
-// Listen for login events
-authEvents.on("login", async (event, context) => {
-  context.logger?.info("Login event received", { event });
 
-  // Example: block login if device is new and riskScore high
-  if (event.isNewDevice && event.riskScore && event.riskScore > 80) {
-    return { action: "block", reason: "High risk new device" };
+⚠️ Important
+
+Your application should have only one AuthEvents instance.
+All listeners and emitters must use this same instance.
+
+🧩 Step 2: Emit events inside existing auth code
+
+📍 src/auth/auth.controller.ts
+
+import { authEvents } from "../auth-events";
+
+export const login = async (req, res) => {
+  const user = await authService.login(req.body);
+
+  // Emit fact, not logic
+  await authEvents.emit("login", {
+    userId: user.id,
+    ip: req.ip,
+    userAgent: req.headers["user-agent"],
+    sessionId: req.sessionID
+  )});
+
+  res.json({ token: user.token });
+};
+
+
+✅ Login responsibility = done
+❌ No logging
+❌ No analytics
+❌ No security rules
+
+🧩 Step 3: Attach operations using listeners
+
+This is where auth-events shines.
+
+🔐 Security listener
+
+📍 auth-events/listeners/security.listener.ts
+
+import { authEvents } from "../index";
+
+authEvents.on("login", async (event) => {
+  if (isNewDevice(event)) {
+    await authEvents.emit("new_device_detected", event);
   }
-
-  return { action: "allow" };
 });
+
+📜 Audit logging
+
+📍 auth-events/listeners/audit.listener.ts
+
+authEvents.on("login", async (event) => {
+  await AuditLog.create({
+    userId: event.userId,
+    action: "LOGIN",
+    ip: event.ip,
+    userAgent: event.userAgent
+  });
+});
+
+📊 Analytics tracking
+
+📍 auth-events/listeners/analytics.listener.ts
+
+authEvents.on("login", async (event) => {
+  analytics.track("user_login", {
+    userId: event.userId,
+    device: event.userAgent
+  )});
+
+🔔 Notifications
+
+📍 auth-events/listeners/notification.listener.ts
+
+authEvents.on("new_device_detected", async (event) => {
+  await sendEmail({
+    to: event.userId,
+    subject: "New device login detected"
+  });
+});
+
+
 
 // Emit a login event
 await authEvents.login({
