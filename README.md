@@ -1,7 +1,4 @@
-# auth-events
-
 ![npm](https://img.shields.io/npm/v/auth-events)
-
 # Auth Events 
 
 **`auth-events`** is a lightweight, powerful, and extensible Node.js library to handle authentication and user-related events in your application. It provides an **event-driven architecture** for login, logout, registration, password changes, role updates, device tracking, risk signals, and more.  
@@ -38,7 +35,7 @@ auth-events
 
 A lightweight event layer for authentication flows.
 
-🧠 Mental Model (Read this first)
+ Mental Model (Read this first)
 
 Think of authentication in two responsibilities:
 
@@ -59,34 +56,7 @@ It does not decide business logic.
 
 This keeps authentication clean and predictable.
 
-❓ Why auth-events?
-
-Authentication logic often becomes bloated over time.
-
-A simple login flow slowly accumulates responsibilities:
-
-audit logging
-
-security checks
-
-analytics
-
-notifications
-
-Soon, your auth code becomes:
-
-hard to read
-
-hard to test
-
-risky to change
-
-auth-events solves this by introducing a small event layer after authentication.
-
-Auth code emits events.
-Side-effects live elsewhere.
-
-🧩 How it works
+ How it works
 
 Your app emits an auth event (e.g. "login").
 
@@ -336,3 +306,4 @@ Webhooks / external notifications
 Priority-based handler execution
 Event persistence for audit / replay
 Rule engine for automated security actions
+
