@@ -1,4 +1,4 @@
-import { AuthEvent, AuthEventHandler, AuthEventType } from "../types";
+import { AuthEvent, AuthEventHandler, AuthEventType, AuthEventContext } from "../types";
 
 export class EventBus {
   private handlers: Map<AuthEventType, AuthEventHandler[]> = new Map();
@@ -8,10 +8,10 @@ export class EventBus {
     this.handlers.set(type, [...existing, handler]);
   }
 
-  async emit(event: AuthEvent, context: unknown) {
+  async emit(event: AuthEvent, context: AuthEventContext) {
     const handlers = this.handlers.get(event.type) ?? [];
     for (const handler of handlers) {
       await handler(event, context);
     }
   }
-}
+}                   
